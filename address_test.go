@@ -3,8 +3,8 @@ package cardano
 import (
 	"testing"
 
-	"github.com/echovl/cardano-go/crypto"
-	"github.com/echovl/cardano-go/internal/bech32"
+	"github.com/1artashes97/cardano-go/crypto"
+	"github.com/1artashes97/cardano-go/internal/bech32"
 )
 
 const (

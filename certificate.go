@@ -3,7 +3,7 @@ package cardano
 import (
 	"fmt"
 
-	"github.com/echovl/cardano-go/crypto"
+	"github.com/1artashes97/cardano-go/crypto"
 )
 
 type CertificateType uint

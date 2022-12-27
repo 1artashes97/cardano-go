@@ -10,8 +10,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/1artashes97/cardano-go"
 	"github.com/blockfrost/blockfrost-go"
-	"github.com/echovl/cardano-go"
 )
 
 // BlockfrostNode implements Node using the blockfrost API.

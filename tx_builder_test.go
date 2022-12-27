@@ -4,7 +4,7 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/echovl/cardano-go/crypto"
+	"github.com/1artashes97/cardano-go/crypto"
 )
 
 var alonzoProtocol = &ProtocolParams{

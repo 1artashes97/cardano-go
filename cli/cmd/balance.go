@@ -3,9 +3,9 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/echovl/cardano-go"
-	"github.com/echovl/cardano-go/blockfrost"
-	"github.com/echovl/cardano-go/wallet"
+	"github.com/1artashes97/cardano-go"
+	"github.com/1artashes97/cardano-go/blockfrost"
+	"github.com/1artashes97/cardano-go/wallet"
 	"github.com/spf13/cobra"
 )
 
