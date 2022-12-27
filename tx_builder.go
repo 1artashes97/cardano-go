@@ -17,6 +17,11 @@ type TxBuilder struct {
 	changeReceiver *Address
 }
 
+type SigIndex struct {
+	Index     int
+	Signature []byte
+}
+
 // NewTxBuilder returns a new instance of TxBuilder.
 func NewTxBuilder(protocol *ProtocolParams) *TxBuilder {
 	return &TxBuilder{
@@ -158,8 +163,7 @@ func (tb *TxBuilder) Reset() {
 	tb.changeReceiver = nil
 }
 
-// Build returns a new transaction using the inputs, outputs and keys provided.
-func (tb *TxBuilder) Build() (*Tx, error) {
+func (tb *TxBuilder) BuildWithoutSigning(signerCount int, pubKeys []crypto.PubKey) (*Tx, error) {
 	inputAmount, outputAmount := tb.calculateAmounts()
 
 	// Check input-output value conservation
@@ -186,7 +190,21 @@ func (tb *TxBuilder) Build() (*Tx, error) {
 			return nil, err
 		}
 	}
+	tb.tx.WitnessSet.VKeyWitnessSet = make([]VKeyWitness, signerCount)
 
+	if pubKeys != nil {
+		for i := range pubKeys {
+			tb.tx.WitnessSet.VKeyWitnessSet[i] = VKeyWitness{
+				VKey: pubKeys[i],
+			}
+		}
+	}
+	return tb.tx, nil
+}
+
+// Build returns a new transaction using the inputs, outputs and keys provided.
+func (tb *TxBuilder) Build() (*Tx, error) {
+	tb.BuildWithoutSigning(len(tb.pkeys), nil)
 	if err := tb.build(); err != nil {
 		return nil, err
 	}
@@ -256,6 +274,14 @@ func (tb *TxBuilder) addChangeIfNeeded(inputAmount, outputAmount *Value) error {
 	return nil
 }
 
+func (tb *TxBuilder) SetSignatures(txHash Hash32, signatures []SigIndex) {
+	for i := range signatures {
+		tb.tx.WitnessSet.VKeyWitnessSet[i] = VKeyWitness{
+			Signature: signatures[i].Signature,
+		}
+	}
+}
+
 func (tb *TxBuilder) build() error {
 	if err := tb.buildBody(); err != nil {
 		return err
@@ -266,8 +292,10 @@ func (tb *TxBuilder) build() error {
 		return err
 	}
 
-	// Create witness set
-	tb.tx.WitnessSet.VKeyWitnessSet = make([]VKeyWitness, len(tb.pkeys))
+	if len(tb.pkeys) != len(tb.tx.WitnessSet.VKeyWitnessSet) {
+		return fmt.Errorf("Inconsistency of signers count and witness set length.")
+	}
+
 	for i, pkey := range tb.pkeys {
 		tb.tx.WitnessSet.VKeyWitnessSet[i] = VKeyWitness{
 			VKey:      pkey.PubKey(),
