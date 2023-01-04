@@ -22,6 +22,11 @@ type SigIndex struct {
 	Signature []byte
 }
 
+type Witness struct {
+	PubKey    crypto.PubKey
+	Signature []byte
+}
+
 // NewTxBuilder returns a new instance of TxBuilder.
 func NewTxBuilder(protocol *ProtocolParams) *TxBuilder {
 	return &TxBuilder{
@@ -163,7 +168,7 @@ func (tb *TxBuilder) Reset() {
 	tb.changeReceiver = nil
 }
 
-func (tb *TxBuilder) BuildWithoutSigning(signerCount int, pubKeys []crypto.PubKey) (*Tx, error) {
+func (tb *TxBuilder) BuildWithoutSigning() (*Tx, error) {
 	inputAmount, outputAmount := tb.calculateAmounts()
 
 	// Check input-output value conservation
@@ -190,17 +195,21 @@ func (tb *TxBuilder) BuildWithoutSigning(signerCount int, pubKeys []crypto.PubKe
 			return nil, err
 		}
 	}
-	tb.tx.WitnessSet.VKeyWitnessSet = make([]VKeyWitness, signerCount)
+	tb.buildBody()
+	return tb.tx, nil
+}
 
-	if pubKeys != nil {
-		for i := range pubKeys {
+func (tb *TxBuilder) ConfigureWitnessSet(witnesses []Witness) {
+	tb.tx.WitnessSet.VKeyWitnessSet = make([]VKeyWitness, len(witnesses))
+
+	if witnesses != nil {
+		for i := range witnesses {
 			tb.tx.WitnessSet.VKeyWitnessSet[i] = VKeyWitness{
-				VKey: pubKeys[i],
+				VKey:      witnesses[i].PubKey,
+				Signature: witnesses[i].Signature,
 			}
 		}
 	}
-	tb.buildBody()
-	return tb.tx, nil
 }
 
 // Build returns a new transaction using the inputs, outputs and keys provided.
