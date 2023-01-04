@@ -199,6 +199,7 @@ func (tb *TxBuilder) BuildWithoutSigning(signerCount int, pubKeys []crypto.PubKe
 			}
 		}
 	}
+	tb.buildBody()
 	return tb.tx, nil
 }
 
