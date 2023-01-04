@@ -75,6 +75,11 @@ type WitnessSet struct {
 	Scripts        []NativeScript `cbor:"1,keyasint,omitempty"`
 }
 
+func (tx *Tx) ConfigureWitnessSet(witnesses []VKeyWitness) {
+	tx.WitnessSet.VKeyWitnessSet = make([]VKeyWitness, len(witnesses))
+	copy(tx.WitnessSet.VKeyWitnessSet, witnesses)
+}
+
 // VKeyWitness is a witnesss that uses verification keys.
 type VKeyWitness struct {
 	_         struct{}      `cbor:",toarray"`

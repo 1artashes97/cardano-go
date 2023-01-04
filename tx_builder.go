@@ -199,22 +199,9 @@ func (tb *TxBuilder) BuildWithoutSigning() (*Tx, error) {
 	return tb.tx, nil
 }
 
-func (tb *TxBuilder) ConfigureWitnessSet(witnesses []Witness) {
-	tb.tx.WitnessSet.VKeyWitnessSet = make([]VKeyWitness, len(witnesses))
-
-	if witnesses != nil {
-		for i := range witnesses {
-			tb.tx.WitnessSet.VKeyWitnessSet[i] = VKeyWitness{
-				VKey:      witnesses[i].PubKey,
-				Signature: witnesses[i].Signature,
-			}
-		}
-	}
-}
-
 // Build returns a new transaction using the inputs, outputs and keys provided.
 func (tb *TxBuilder) Build() (*Tx, error) {
-	tb.BuildWithoutSigning(len(tb.pkeys), nil)
+	tb.BuildWithoutSigning()
 	if err := tb.build(); err != nil {
 		return nil, err
 	}
